@@ -2,6 +2,8 @@ import React from 'react'
 import { Form, Link } from 'react-router-dom'
 import Login from './Login'
 import { useForm } from "react-hook-form";
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 function SignUp() {
 
@@ -11,7 +13,29 @@ function SignUp() {
         formState: { errors },
       } = useForm();
     
-      const onSubmit = (data) => console.log(data);
+      const onSubmit = async (data) => {
+        const userInfo={
+          username:data.username,
+          email:data.email,
+          password:data.password,
+        }
+
+       await axios.post("http://localhost:4001/user/signup",userInfo).then((res)=>{
+          console.log(data)
+          if(res.data){
+            toast.success("SignUP Successfully");
+            // alert ("SignUP Successfully");
+            localStorage.setItem("Users",JSON.stringify(res.data.user));
+          }
+
+        }).catch((err)=>{
+          if(err.response){
+            console.log(err);
+            toast.error("Error: "+err.response.data.message);
+            // alert("Error: "+err.response.data.message);
+          }
+        })
+      };
     
 
   return (
@@ -38,9 +62,9 @@ function SignUp() {
                 Username
             </span><br />
             <input type="text" placeholder="Enter a username" className="w-80 px-3 py-2 border rounded-md outline-none"
-            input {...register("text", { required: true })} 
+            input {...register("username", { required: true })} 
             />
-            {errors.email && <span className="text-red-500 text-sm">This field is required</span>}
+            {errors.username && <span className="text-red-500 text-sm">This field is required</span>}
             
           </div>
           
@@ -59,9 +83,9 @@ function SignUp() {
                 Password
             </span><br />
             <input type="text" placeholder="Enter your password" className="w-80 px-3 py-2 border rounded-md outline-none"
-            input {...register("text", { required: true })} 
+            input {...register("password", { required: true })} 
             />
-            {errors.text && <span className="text-red-500 text-sm">This field is required</span>}
+            {errors.password && <span className="text-red-500 text-sm">This field is required</span>}
           </div>
 
           <div className="flex justify-between mt-4">
